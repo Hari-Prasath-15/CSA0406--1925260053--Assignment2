@@ -1,26 +1,3 @@
-/*
- * File: threads.c
- * Course: CSA0406 - Operating Systems (Assignment 2, Q3 - Threads)
- * Context: City Traffic-Camera Number-Plate Reader (64 Cameras)
- *
- * Description:
- * Simulates processing number-plate frames from 64 traffic cameras and
- * compares five execution models using the identical deterministic
- * CPU workload per camera:
- *   1. Sequential processing (1 main thread, baseline)
- *   2. One thread per camera (64 threads)
- *   3. Thread pool with 4 worker threads
- *   4. Thread pool with 8 worker threads
- *   5. Thread pool with 16 worker threads
- * Also demonstrates what happens when multiple threads increment a
- * shared counter with and without a POSIX mutex lock.
- *
- * Compilation (Ubuntu Linux / WSL):
- *   gcc -std=c11 -Wall -Wextra threads.c -o threads -pthread
- *
- * Execution:
- *   ./threads
- */
 
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
