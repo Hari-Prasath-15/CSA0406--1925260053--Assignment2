@@ -1,7 +1,6 @@
 #include <stdio.h>
 
 #define N 4
-
 int main(void)
 {
     const char *name[N] = {"P1", "P2", "P3", "P4"};
