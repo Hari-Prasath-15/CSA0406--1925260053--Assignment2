@@ -1,0 +1,75 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+#define NUM_CHILDREN 3
+
+int main(void)
+{
+    const char *roles[NUM_CHILDREN] = {
+        "Student Exam Session",
+        "Auto-Save Answer Service",
+        "Video Proctoring Monitor"
+    };
+
+    pid_t child_pids[NUM_CHILDREN];
+
+    printf("====================================================\n");
+    printf("ONLINE EXAM SERVER - PROCESS CREATION DEMONSTRATION\n");
+    printf("====================================================\n");
+    printf("[Parent Server] Started: PID = %d, PPID = %d\n\n",
+           (int)getpid(), (int)getppid());
+
+    /* Create child processes using fork() */
+    for (int i = 0; i < NUM_CHILDREN; i++) {
+        /* Flush stdout before fork() to avoid duplicate output */
+        fflush(stdout);
+
+        pid_t pid = fork();
+
+        if (pid < 0) {
+            /* fork() returns -1 if child creation fails */
+            perror("Error: fork() failed");
+            exit(EXIT_FAILURE);
+        } else if (pid == 0) {
+            /* Child process block (fork() returns 0 to child) */
+            printf("  [Child %d - %s] Created: PID = %d, PPID = %d\n",
+                   i + 1, roles[i], (int)getpid(), (int)getppid());
+
+            /* Simulate session / I/O wait for 2 seconds */
+            sleep(2);
+
+            printf("  [Child %d - %s] Finished (PID = %d)\n",
+                   i + 1, roles[i], (int)getpid());
+            exit(EXIT_SUCCESS);
+        } else {
+            /* Parent process block (fork() returns child PID) */
+            child_pids[i] = pid;
+            printf("[Parent Server] Created Child %d (%s) PID = %d\n",
+                   i + 1, roles[i], (int)pid);
+        }
+    }
+
+    printf("\n[Parent Server] Waiting for children to finish...\n\n");
+
+    /* Parent waits for each child process using waitpid() */
+    for (int i = 0; i < NUM_CHILDREN; i++) {
+        int status = 0;
+        pid_t done = waitpid(child_pids[i], &status, 0);
+
+        if (done < 0) {
+            perror("Error: waitpid() failed");
+        } else if (WIFEXITED(status)) {
+            printf("[Parent Server] Reaped Child PID = %d (Exit = %d)\n",
+                   (int)done, WEXITSTATUS(status));
+        }
+    }
+
+    printf("\n[Parent Server] All children exited. Server done (PID = %d).\n",
+           (int)getpid());
+
+    return 0;
+}
